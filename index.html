@@ -1,0 +1,254 @@
+<html>
+
+	<head>
+	<title>Instagram Extractor</title>
+	<script type="text/javascript" src="jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+	<script src="jquery-ui-1.12.1/jquery-ui.js"></script>
+	<script
+	  src="https://code.jquery.com/jquery-3.3.1.js"
+	  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+	  crossorigin="anonymous"></script>
+
+	<style>
+
+	body{
+		position:relative;
+		background-color: white;
+	}
+		input{
+		display: block;}
+
+		table, td {
+    table-layout: fixed;
+    width: 100%;
+		}
+
+		#jumbotron1{
+		background-image:  url("http://www.brandgradients.com/img/backgrounds/instagram-hex-colors-gradient-background.png");
+		background-repeat: no-repeat;
+background-size: cover;
+		text-align: center;
+		color: white;
+		margin-bottom: 0;
+		border-radius: 15px;
+
+		}
+
+		#steps{
+			list-style: none;
+			text-align: center;
+
+		}
+
+		#finishedScrape{
+			padding-top: 30px;
+		}
+
+#InputDiv{
+	padding-bottom: 30px;
+}
+
+#influencerFormat{
+	padding-bottom: 1%;
+}
+
+.container{
+	padding-left:0;
+	padding-right:0;
+}
+
+		li{
+					text-align: center;
+					padding-bottom: 1%;
+		}
+
+#gandalf{
+	border-radius: 15px;
+}
+
+#mainDiv{
+	margin: auto;
+width: 50%;
+padding: 40px 50px 0px;
+}
+#csvFormat{
+	padding-top: 30px;
+}
+
+	</style>
+
+	</head>
+
+	<body>
+		<div class="container bg-light" id="gandalf">
+
+<div class="container">
+		<div class="jumbotron" id="jumbotron1">
+			<h1 class="display-3">Instagram Extractor</h1>
+			<p class="lead"><b>Get data from Instagram in 4 easy steps!</b></p>
+			<hr class="m-y-2">
+
+
+			<ul id="steps" class="container">
+			  <li class="h6">Step 1: Enter the number of Instagram accounts you want to extract data from</li>
+			  <li class="h6">Step 2: Press the create text fields button</li>
+				<li class="h6">Step 3: Type the Instagram handles on the text fields</li>
+			  <li class="h6">Step 4: Press Create table</li>
+			</ul>
+
+
+		</div>
+		</div>
+
+		<div id="mainDiv">
+		<h5 class="font-weight-light">Enter the number of Instagram users to be extracted</h5>
+
+		<div id="InputDiv">
+		<input type="text" id="influencerAmount" style="float:left;">
+		<button id="submitter" onclick="textFieldFunction()"> Create text fields </button>
+	</div>
+
+	<div id="influencerFormat">
+		<div id="influencerDiv"></div>
+	</div>
+
+		<button id="process" onclick="scrapingFunction()"> Create Table </button>
+<div id="csvFormat">
+	<h4 class="font-weight-light">Data formatted with Comma Seperated Values</h4>
+	<div id="finishedScrape"></div>
+</div>
+</div>
+</div>
+
+		<br><br>
+		<div class="container">
+			<hr>
+		<table class="table table-striped table-bordered" id="myTable">
+		<thead>
+		<tr>
+	    <th scope="col">Photo</th>
+			<th scope="col">Full Name</th>
+	    <th scope="col">Username</th>
+	    <th scope="col">Follower Count</th>
+			<th scope="col">Engagement Rate</th>
+	    <th scope="col">Instagram Link</th>
+			<th scope="col">Notes</th>
+	  </tr>
+	</thead>
+	</table>
+</div>
+
+	<br>
+
+
+
+
+		<script type="text/javascript">
+
+
+		function textFieldFunction(){
+			for(i=0; i < document.getElementById("influencerAmount").value; i++){
+			    var x = document.createElement("input");
+					x.setAttribute("placeholder", "Influencers Name")
+			    x.setAttribute("type", "text");
+					x.setAttribute("id", "Influencer" + i);
+			    document.getElementById('influencerDiv').appendChild(x);
+			}
+		}
+
+	function scrapingFunction(){
+		alert("Instagram users accepted. Please wait while we load results...");
+		for(i=0;i< document.getElementById("influencerAmount").value;i++){
+
+			$.getJSON('http://www.whateverorigin.org/get?url=' + encodeURIComponent('https://www.instagram.com/') + $("#Influencer" + i).val() + '&callback=?', function(data){
+
+
+				var str = data.contents; //Create New String of Scraped Website
+				var newStr = jQuery(str).text();
+				console.log(newStr);
+		var locateName = newStr.search('username":"');
+		var locateNameEnd = newStr.search('","connected_fb_page')
+		var userName = newStr.slice(locateName, locateNameEnd);
+		var foundYouName = userName.replace(/[!@#$%^&*:"]/g, "");
+		var finalName = foundYouName.slice(8, foundYouName.length);
+		var lastoftheNames = "Username:" +finalName;
+
+
+		var igLink = encodeURI("https://www.instagram.com/" + finalName);
+
+
+		var locateFollowCount = newStr.search("\"edge_followed_by\"");
+		var locateFollowCountEnd = newStr.search("\"followed_by_viewer\"")
+		var FollowCount = newStr.slice(locateFollowCount, locateFollowCountEnd);
+		var foundYouFollowCount =  FollowCount.replace(/[!@#$%^&*:{},"]/g, "");
+		var finalFollowCount = foundYouFollowCount.slice(21, foundYouFollowCount.length);
+		var numberOfFollowCount = parseInt(finalFollowCount);
+
+
+		var locateProfilePic = newStr.search("\"profile_pic_url\"");
+		var locateProfilePicEnd = newStr.search("\",\"profile_pic_url_hd\"");
+		var foundYouProfilePic = newStr.slice(locateProfilePic, locateProfilePicEnd);
+
+		var finalProfilePic = foundYouProfilePic.slice(19, foundYouProfilePic.length);
+
+
+			var locateFullName = newStr.search("\"full_name\":\"");
+			var locateFullNameEnd = newStr.search("\",\"has_channel")
+			var foundYouFullName = newStr.slice(locateFullName, locateFullNameEnd);
+			var finalFullName = foundYouFullName.slice(13, foundYouFullName.length);
+
+			var locatePostLikes = newStr.search("\"edge_liked_by\":{\"");
+			var locatePostLikesEnd = newStr.search("},\"edge_media_preview_like\"")
+			var foundYouPostLikes = newStr.slice(locatePostLikes, locatePostLikesEnd);
+			var finalPostLikes = foundYouPostLikes.slice(25, foundYouPostLikes.length);
+			var numberOfPostLikes = parseInt(finalPostLikes);
+
+			var locatePostComments = newStr.search("\"edge_media_to_comment\":{\"");
+			var locatePostCommentsEnd = newStr.search("},\"comments_disabled\"")
+			var foundYouPostComments = newStr.slice(locatePostComments, locatePostCommentsEnd);
+			var finalPostComments = foundYouPostComments.slice(33, foundYouPostComments.length);
+			var numberOfPostComments = parseInt(finalPostComments);
+
+			var EngagementRate = (numberOfPostLikes+numberOfPostComments)/numberOfFollowCount * 100;
+
+			var finalEngagementRate = EngagementRate.toFixed(4);
+			
+
+
+		var locateFollowers = newStr.search("Followers:");
+		var locateFollowersEnd = newStr.search("Allies:")
+		var foundYouFollowers = newStr.slice(locateFollowers, locateFollowersEnd);
+
+		var OmegaString =  "<p>" + finalName + ", " + finalFullName + ", " + igLink + ", " + finalFollowCount + "</p>";
+
+		$("#finishedScrape").append(OmegaString);
+
+		var table = document.getElementById("myTable");
+    var row = table.insertRow(-1);
+    var cell0 = row.insertCell(0);
+    var cell1 = row.insertCell(1);
+    var cell2 = row.insertCell(2);
+    var cell3 = row.insertCell(3);
+		var cell4 = row.insertCell(4);
+		var cell5 = row.insertCell(5);
+		var cell6 = row.insertCell(6);
+    cell0.innerHTML = "<img src=\"" + finalProfilePic + '">';
+    cell1.innerHTML = finalFullName;
+    cell2.innerHTML = finalName;
+    cell3.innerHTML = finalFollowCount;
+		cell4.innerHTML = finalEngagementRate;
+		cell5.innerHTML = "<a href=\"" + igLink + '" target="_blank">' + finalName + "'s Instagram Link</a>" ;
+		cell6.innerHTML = "";
+			});
+
+		}
+	}
+
+		</script>
+	</body>
+
+</html>
+
+<!-- Kate is the cutest little sister -Irnstad/Syll ->
